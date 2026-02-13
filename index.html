@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XDrive | Secure File Storage on X</title>
+    <link href="./dist/style.css" rel="stylesheet">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+</head>
+
+<body
+    class="bg-slate-50 font-sans text-slate-800 h-screen flex flex-col overflow-hidden selection:bg-indigo-100 selection:text-indigo-700">
+    <script>
+        window.onerror = function (msg, url, line, col, error) {
+            alert("Error: " + msg + "\nurl: " + url + "\nline: " + line);
+        };
+    </script>
+    <!-- Navbar -->
+    <nav
+        class="bg-white/80 backdrop-blur-md border-b border-slate-200 px-6 py-4 flex justify-between items-center shrink-0 z-20">
+        <div class="flex items-center space-x-3">
+            <div
+                class="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center text-white shadow-lg shadow-slate-200">
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                    <path
+                        d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                </svg>
+            </div>
+            <div>
+                <span class="text-xl font-bold tracking-tight text-slate-900">XDrive</span>
+                <span class="text-xs text-slate-500 block font-medium uppercase tracking-wider">Unlimited Storage</span>
+            </div>
+        </div>
+
+        <!-- Tab Navigation -->
+        <div class="flex space-x-1 bg-slate-100 p-1.5 rounded-xl border border-slate-200/50">
+            <button id="tab-encode"
+                class="px-6 py-2 rounded-lg text-sm font-semibold bg-white shadow-sm text-slate-900 transition-all ring-1 ring-black/5">Encode</button>
+            <button id="tab-drive"
+                class="px-6 py-2 rounded-lg text-sm font-semibold text-slate-500 hover:text-slate-900 hover:bg-white/50 transition-all">My
+                Drive</button>
+            <button id="tab-decode"
+                class="px-6 py-2 rounded-lg text-sm font-semibold text-slate-500 hover:text-slate-900 hover:bg-white/50 transition-all">Decode</button>
+        </div>
+
+        <div class="w-10"></div> <!-- Spacer for balance -->
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 overflow-hidden relative">
+
+        <!-- View: Encode (Upload) -->
+        <div id="view-encode"
+            class="absolute inset-0 flex flex-col items-center justify-center p-6 transition-all duration-300">
+            <div
+                class="w-full max-w-2xl bg-white rounded-3xl shadow-xl shadow-slate-200/50 overflow-hidden border border-slate-100">
+                <div class="p-12 text-center transition-colors hover:bg-slate-50/50 cursor-pointer group" id="drop-zone"
+                    onclick="document.getElementById('fileInput').click()">
+                    <div
+                        class="w-20 h-20 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300 shadow-inner">
+                        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-slate-900 mb-3">Encode files for X</h3>
+                    <p class="text-slate-500 mb-8 text-lg">Drag & drop or click to browse</p>
+
+                    <input type="file" id="fileInput" class="hidden">
+
+                    <button
+                        class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-10 rounded-2xl transition-all shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 hover:-translate-y-0.5 active:translate-y-0 text-lg">
+                        Select File to Encode
+                    </button>
+                </div>
+
+                <!-- Settings -->
+                <div class="bg-slate-50 px-10 py-6 border-t border-slate-100 flex justify-between items-center">
+                    <span class="text-slate-500 font-semibold text-sm uppercase tracking-wide">Chunk Size</span>
+                    <div class="flex space-x-6">
+                        <label class="flex items-center cursor-pointer group">
+                            <input type="radio" name="limit" value="280" checked
+                                class="w-5 h-5 text-indigo-600 border-gray-300 focus:ring-indigo-500">
+                            <span
+                                class="ml-3 text-slate-700 font-medium group-hover:text-indigo-600 transition-colors">Standard
+                                (280)</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer group">
+                            <input type="radio" name="limit" value="25000"
+                                class="w-5 h-5 text-indigo-600 border-gray-300 focus:ring-indigo-500">
+                            <span
+                                class="ml-3 text-slate-700 font-medium group-hover:text-indigo-600 transition-colors">Premium
+                                (25k)</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Upload Progress -->
+            <div id="upload-progress"
+                class="hidden w-full max-w-2xl mt-8 bg-white p-6 rounded-2xl shadow-lg border border-slate-100">
+                <div class="flex justify-between text-sm mb-3 font-semibold text-slate-700">
+                    <span>Processing...</span>
+                    <span id="progress-percent" class="text-indigo-600">0%</span>
+                </div>
+                <div class="w-full bg-slate-100 rounded-full h-3 overflow-hidden">
+                    <div id="progress-bar" class="bg-indigo-600 h-3 rounded-full transition-all duration-300 shimmer"
+                        style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- View: Drive (History + Active File) -->
+        <div id="view-drive" class="absolute inset-0 flex flex-col p-6 transition-transform duration-300 hidden">
+            <!-- Breadcrumbs / Action Bar -->
+            <div class="flex justify-between items-center mb-6 px-2">
+                <h2 class="text-2xl font-bold text-slate-800 flex items-center">
+                    <svg class="w-6 h-6 mr-2 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10">
+                        </path>
+                    </svg>
+                    My Drive
+                </h2>
+                <div class="flex space-x-2">
+                    <button id="refresh-drive"
+                        class="p-2 text-slate-400 hover:text-indigo-600 rounded-full hover:bg-indigo-50 transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
+                            </path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex-1 flex space-x-8 overflow-hidden">
+                <!-- File List (Sidebar) -->
+                <div class="w-1/3 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-y-auto"
+                    id="file-list">
+                    <!-- Dynamic File Items -->
+                    <div class="p-8 text-center text-slate-400 text-sm">No files uploaded yet.</div>
+                </div>
+
+                <!-- Active Thread View (Main) -->
+                <div class="flex-1 bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col overflow-hidden relative"
+                    id="thread-view">
+                    <!-- Placeholder -->
+                    <div class="flex-1 flex flex-col items-center justify-center text-slate-300">
+                        <svg class="w-16 h-16 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                            </path>
+                        </svg>
+                        <p class="text-lg font-medium">Select a file to view thread</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- View: Decode -->
+        <div id="view-decode" class="absolute inset-0 flex flex-col p-6 transition-transform duration-300 hidden">
+            <div class="w-full max-w-4xl mx-auto flex-1 flex flex-col">
+                <h2 class="text-2xl font-bold text-slate-800 mb-6 flex items-center">
+                    <svg class="w-6 h-6 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                    </svg>
+                    Decode Files
+                </h2>
+                <div class="flex-1 bg-white rounded-2xl shadow-sm border border-slate-200 p-8 flex flex-col">
+                    <textarea id="pasteArea"
+                        class="flex-1 p-6 border border-slate-200 rounded-xl resize-none focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 font-mono text-sm bg-slate-50 transition-all outline-none"
+                        placeholder="Paste your XDrive thread content here..."></textarea>
+
+                    <div
+                        class="mt-6 flex justify-between items-center bg-slate-50 p-4 rounded-xl border border-slate-100">
+                        <div class="flex items-center text-sm text-slate-500">
+                            <svg class="w-5 h-5 mr-2 text-slate-400" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            Supports raw chunks, full threads, or JSON manifests.
+                        </div>
+                        <button id="decodeButton"
+                            class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-lg shadow-emerald-500/30 hover:-translate-y-0.5 active:translate-y-0 flex items-center">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                            </svg>
+                            Decode & Download
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script type="module" src="/src/js/main.js"></script>
+</body>
+
+</html>
