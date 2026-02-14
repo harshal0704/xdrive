@@ -1,46 +1,52 @@
-# XDrive
+# XDrive: Secure File Storage on X (Twitter)
 
-**XDrive** turns X.com (Twitter) into your personal, unlimited file storage. It encodes files into X-friendly threaded posts (text chunks) and decodes them back to their original format.
+XDrive transforms your X (Twitter) profile into unlimited cloud storage. It encodes any file into text-based tweets, which can be stored publicly or privately on X, and decodes them back into original files whenever you need them.
 
-## Features
-- **Upload Any File**: Converts images, documents, and archives into Base64 text.
-- **Smart Threading**: Automatically splits files into 280-character chunks (or 25k for Premium) and generates a reply chain.
-- **Drive History**: Saves your upload history locally in your browser using IndexedDB.
-- **Integrated Decoder**: Paste your X thread to instantly recover the file.
-- **Private & Secure**: All processing happens 100% in your browser. No backend server.
+## 🚀 Features
+-   **Encode Anything**: Convert images, PDFs, ZIPs, etc., into text threads.
+-   **Smart Splitting**: Automatically splits large files into 280-character chunks (or 25k for Premium).
+-   **Local Storage**: Saves your encoded files to your browser's local storage (IndexedDB) for easy access.
+-   **One-Click Decode**: Paste a thread (or just the text) to get your file back.
 
-## How to Run
-Since this project uses ES Modules, you need a local web server to run it (opening `index.html` directly may cause CORS errors).
+## 🛠️ Setup & Run
 
-1. **Install Dependencies**
-   ```bash
-   npm install
-   ```
+1.  **Install Dependencies**:
+    ```bash
+    npm install
+    ```
 
-2. **Start Local Server**
-   ```bash
-   npm start
-   ```
-   This will run the app at `http://127.0.0.1:8080`.
+2.  **Start the App**:
+    ```bash
+    npm start
+    ```
+    This will launch a local server at `http://localhost:8080` (or 8081).
 
-3. **Build CSS (Optional)**
-   If you modify styles, rebuild Tailwind:
-   ```bash
-   npm run build:css
-   ```
+## 📖 How to Use
 
-## Usage
-1.  **Upload**: Select a file. The app will encode and split it.
-2.  **Post**: Go to "My Drive", click your file, and use the "Post" buttons to send the Header, Chunks, and Manifest to X.
-3.  **Decode**: Copy a full thread from X, paste it into the "Decode" tab, and download your original file.
+### 1. Upload & Encode
+1.  Open the app in your browser.
+2.  Go to the **"Encode"** tab.
+3.  Click **"Select File to Encode"**.
+4.  Choose your file. The app will process it and save it to "My Drive".
 
-## Tech Stack
-- Vanilla JavaScript (ES Modules)
-- Tailwind CSS (v4)
-- Dexie.js (IndexedDB)
-- HTML5 File API
+### 2. Post to X
+1.  Go to the **"My Drive"** tab.
+2.  Click on the file you just encoded.
+3.  You will see a generated **Thread**:
+    *   **Step 1 (Header)**: Contains filename and size.
+    *   **Step 2 (Chunks)**: The actual file data converting to text.
+    *   **Step 3 (Manifest)**: Metadata for reliable decoding.
+4.  Click **"Copy Full Thread"** (or copy individual parts) and post them as a thread on X.
 
-## Future Roadmap
-- [ ] Browser Extension for one-click posting/decoding.
-- [ ] X API integration for automatic posting (requires backend).
-- [ ] Encryption support.
+### 3. Decode & Download
+1.  Go to the tweet thread on X.
+2.  Copy the **entire text** of the thread (Header, Chunks, and Manifest).
+    *   *Tip: You can just copy the text content, even with extra words like "Replying to...", the decoder is smart enough to find the data.*
+3.  Open XDrive and go to the **"Decode"** tab.
+4.  Paste the text into the box.
+5.  Click **"Decode & Download"**.
+6.  Your file will be reconstructed and downloaded!
+
+## ⚠️ Notes
+-   This app runs entirely in your browser. No data is sent to any third-party server (other than X when you post).
+-   **Do not lose the Manifest!** It contains the file type and name information.

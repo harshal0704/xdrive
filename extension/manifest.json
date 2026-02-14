@@ -1,0 +1,33 @@
+{
+    "manifest_version": 3,
+    "name": "XDrive Helper",
+    "version": "1.0",
+    "description": "Automatically decode and download files from XDrive threads on X (Twitter).",
+    "permissions": [
+        "activeTab",
+        "scripting",
+        "downloads"
+    ],
+    "host_permissions": [
+        "https://twitter.com/*",
+        "https://x.com/*"
+    ],
+    "content_scripts": [
+        {
+            "matches": [
+                "https://twitter.com/*",
+                "https://x.com/*"
+            ],
+            "js": [
+                "lib/decoder.js",
+                "content/x_reader.js"
+            ],
+            "css": [
+                "content/style.css"
+            ]
+        }
+    ],
+    "background": {
+        "service_worker": "background.js"
+    }
+}
