@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XDrive Documentation | harshalsp</title>
+    <meta name="google-site-verification" content="vPdZ1rzMuka8gCZFKRMek5HX04b9Eu4VWJv7tSzcyQg" />
+    <!-- SEO and CSS mostly inherited from index.html -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        'neon-pink': '#ff007f',
+                        'neon-yellow': '#ccff00',
+                        'dark-violet': '#120024',
+                        'cyber-black': '#050505'
+                    },
+                    fontFamily: {
+                        'mono': ['"Courier New"', 'Courier', 'monospace'],
+                        'sans': ['system-ui', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+        body {
+            font-family: 'Share Tech Mono', monospace;
+            overflow-x: hidden;
+            margin: 0;
+            background: #000;
+        }
+
+        .scanlines {
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0) 50%, rgba(0, 0, 0, 0.2) 50%, rgba(0, 0, 0, 0.2));
+            background-size: 100% 4px;
+            pointer-events: none;
+        }
+
+        .glitch-text {
+            position: relative;
+        }
+
+        .glitch-text::before,
+        .glitch-text::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: transparent;
+        }
+
+        .glitch-text::before {
+            left: 2px;
+            text-shadow: -2px 0 #ff007f;
+            clip: rect(24px, 550px, 90px, 0);
+            animation: glitch-anim-2 3s infinite linear alternate-reverse;
+        }
+
+        .glitch-text::after {
+            left: -2px;
+            text-shadow: -2px 0 #ccff00;
+            clip: rect(85px, 550px, 140px, 0);
+            animation: glitch-anim 2.5s infinite linear alternate-reverse;
+        }
+
+        @keyframes glitch-anim {
+            0% {
+                clip: rect(22px, 9999px, 83px, 0);
+            }
+
+            20% {
+                clip: rect(6px, 9999px, 86px, 0);
+            }
+
+            40% {
+                clip: rect(67px, 9999px, 86px, 0);
+            }
+
+            60% {
+                clip: rect(59px, 9999px, 2px, 0);
+            }
+
+            80% {
+                clip: rect(74px, 9999px, 66px, 0);
+            }
+
+            100% {
+                clip: rect(100px, 9999px, 12px, 0);
+            }
+        }
+
+        @keyframes glitch-anim-2 {
+            0% {
+                clip: rect(65px, 9999px, 100px, 0);
+            }
+
+            20% {
+                clip: rect(81px, 9999px, 8px, 0);
+            }
+
+            40% {
+                clip: rect(31px, 9999px, 20px, 0);
+            }
+
+            60% {
+                clip: rect(27px, 9999px, 81px, 0);
+            }
+
+            80% {
+                clip: rect(11px, 9999px, 34px, 0);
+            }
+
+            100% {
+                clip: rect(7px, 9999px, 88px, 0);
+            }
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #050505;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #ff007f;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #ccff00;
+        }
+    </style>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+</head>
+
+<body class="text-white selection:bg-neon-pink selection:text-white relative">
+
+    <!-- Background Grid -->
+    <div class="fixed inset-0 z-0 opacity-20 pointer-events-none"
+        style="background-image: linear-gradient(#120024 1px, transparent 1px), linear-gradient(90deg, #120024 1px, transparent 1px); background-size: 40px 40px;">
+    </div>
+
+
+    <!-- Scanline overlay -->
+    <div class="fixed inset-0 z-10 scanlines mix-blend-overlay"></div>
+
+    <!-- Header -->
+    <header
+        class="relative z-20 border-b border-neon-pink/30 bg-cyber-black/80 backdrop-blur-md px-6 py-4 flex justify-between items-center sticky top-0">
+        <a href="/" class="flex items-center space-x-3 hover:opacity-80 transition-opacity">
+            <div
+                class="w-10 h-10 bg-black flex items-center justify-center border-2 border-neon-pink shadow-[0_0_15px_rgba(255,0,127,0.5)]">
+                <svg class="w-6 h-6 text-neon-pink" fill="currentColor" viewBox="0 0 24 24">
+                    <path
+                        d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231z" />
+                </svg>
+            </div>
+            <div>
+                <div class="text-2xl font-bold uppercase tracking-widest text-white glitch-text" data-text="XDRIVE">
+                    XDRIVE</div>
+                <div class="text-[10px] text-neon-pink tracking-[0.2em] uppercase">Return to Terminal</div>
+            </div>
+        </a>
+        <div class="flex space-x-6 items-center">
+            <a href="/docs.html"
+                class="text-neon-pink hover:text-white font-bold tracking-[0.2em] uppercase text-sm transition-colors relative group">
+                DOCUMENTATION
+                <span class="absolute -bottom-1 left-0 w-full h-0.5 bg-neon-pink transition-all"></span>
+            </a>
+            <a href="/extension.html"
+                class="text-neon-yellow hover:text-white font-bold tracking-[0.2em] uppercase text-sm transition-colors relative group">
+                EXTENSION
+                <span
+                    class="absolute -bottom-1 left-0 w-0 h-0.5 bg-neon-yellow group-hover:w-full transition-all"></span>
+            </a>
+        </div>
+    </header>
+
+    <!-- Content -->
+    <main class="relative z-20 max-w-5xl mx-auto py-16 px-6 sm:px-12">
+        <h1 class="text-5xl md:text-7xl font-bold text-neon-pink uppercase tracking-widest mb-4 glitch-text"
+            data-text="SYSTEM_MANUAL">SYSTEM_MANUAL</h1>
+        <p class="text-xl text-gray-400 mb-16 max-w-2xl leading-relaxed">Everything you need to know about the Stealth
+            Encoding Matrix and Zero-Knowledge Architecture deployed within XDrive.</p>
+
+        <!-- Bold Section 1 -->
+        <div
+            class="mb-16 bg-black/40 border-l-4 border-neon-pink p-8 shadow-[0_0_30px_rgba(255,0,127,0.1)] hover:bg-black/60 transition-colors">
+            <h2 class="text-3xl font-bold text-white mb-6 tracking-wider">> AES-256 ZERO KNOWLEDGE CRYPTOGRAPHY</h2>
+            <p class="text-gray-300 leading-relaxed mb-4 text-lg">
+                XDrive uses Web Crypto API natively in your browser. When you input a secret key, the V8 engine
+                immediately derives a cryptographic algorithm applying AES-GCM standards, adding a massive randomized
+                Salt and Initialization Vector (IV).
+            </p>
+            <p class="text-neon-pink font-bold uppercase text-sm tracking-widest mt-6">
+                THE EDGE SERVER NEVER SEES YOUR PASSWORD. IT NEVER SEES YOUR RAW DATA. If you lose your password, the
+                payload is destroyed forever.
+            </p>
+        </div>
+
+        <!-- Bold Section 2 -->
+        <div
+            class="mb-16 bg-black/40 border-l-4 border-neon-yellow p-8 shadow-[0_0_30px_rgba(204,255,0,0.1)] hover:bg-black/60 transition-colors flex flex-col md:flex-row gap-8 items-center">
+            <div class="flex-1">
+                <h2 class="text-3xl font-bold text-white mb-6 tracking-wider">> PIXEL MATRIX INJECTION (STEGANOGRAPHY)
+                </h2>
+                <p class="text-gray-300 leading-relaxed mb-4 text-lg">
+                    Once the browser encrypts your payload, it slices your encrypted blob into strict 2MB buffers to
+                    respect Vercel Edge constraints. These buffers are POSTed to the backend.
+                </p>
+                <p class="text-gray-300 leading-relaxed text-lg mb-4">
+                    The backend reads the binary bytes, and systematically maps each byte iteratively into the Red,
+                    Green, and Blue channels of an uncompressed lossless PNG pixel grid!
+                </p>
+            </div>
+            <div
+                class="w-48 h-48 bg-black border-2 border-neon-yellow shadow-[0_0_20px_rgba(204,255,0,0.5)] flex items-center justify-center p-4">
+                <svg class="w-full h-full text-neon-yellow opacity-80" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="0.5"
+                        d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5">
+                    </path>
+                </svg>
+            </div>
+        </div>
+
+        <!-- Bold Section 3 -->
+        <div class="mb-16 bg-black/40 border border-white/20 p-8 hover:border-neon-pink transition-colors group">
+            <h2
+                class="text-3xl font-bold text-neon-pink mb-6 tracking-wider drop-shadow-[0_0_10px_rgba(255,0,127,0.8)]">
+                > VERCEL SERVERLESS ARCHITECTURE</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                    <h3
+                        class="text-white font-bold mb-2 uppercase text-sm tracking-widest text-gray-400 border-b border-gray-700 pb-2">
+                        /api/encode </h3>
+                    <p class="text-gray-300 text-sm mt-3">Stateless edge function. Receives 2MB binary arrays, wraps
+                        them in Jimp PNG structure, overrides Headers, and streams back `image/png` chunks.</p>
+                </div>
+                <div>
+                    <h3
+                        class="text-white font-bold mb-2 uppercase text-sm tracking-widest text-gray-400 border-b border-gray-700 pb-2">
+                        /api/decode</h3>
+                    <p class="text-gray-300 text-sm mt-3">Stateless edge function. Receives full PNG grid arrays, scans
+                        the RGB bounds for the 4-byte `XDRV` magic signature, extracts JSON headers + binary payload,
+                        and streams Base64 format string back to client.</p>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Floating Footer -->
+    <footer class="text-center py-8 z-30 relative mt-12 bg-black border-t border-neon-pink/20">
+        <div class="text-[11px] uppercase tracking-[0.2em] text-gray-500">
+            Made with <span class="text-neon-pink">❤</span> by <a href="#"
+                class="text-neon-yellow hover:text-white transition-colors font-bold">harshalsp</a>
+        </div>
+    </footer>
+
+</body>
+
+</html>

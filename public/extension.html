@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XDrive Extension | harshalsp</title>
+    <meta name="google-site-verification" content="vPdZ1rzMuka8gCZFKRMek5HX04b9Eu4VWJv7tSzcyQg" />
+    <!-- SEO and CSS mostly inherited from index.html -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        'neon-pink': '#ff007f',
+                        'neon-yellow': '#ccff00',
+                        'dark-violet': '#120024',
+                        'cyber-black': '#050505'
+                    },
+                    fontFamily: {
+                        'mono': ['"Courier New"', 'Courier', 'monospace'],
+                        'sans': ['system-ui', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+        body {
+            font-family: 'Share Tech Mono', monospace;
+            overflow-x: hidden;
+            margin: 0;
+            background: #000;
+        }
+
+        .scanlines {
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0) 50%, rgba(0, 0, 0, 0.2) 50%, rgba(0, 0, 0, 0.2));
+            background-size: 100% 4px;
+            pointer-events: none;
+        }
+
+        .glitch-text {
+            position: relative;
+        }
+
+        .glitch-text::before,
+        .glitch-text::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: transparent;
+        }
+
+        .glitch-text::before {
+            left: 2px;
+            text-shadow: -2px 0 #ff007f;
+            clip: rect(24px, 550px, 90px, 0);
+            animation: glitch-anim-2 3s infinite linear alternate-reverse;
+        }
+
+        .glitch-text::after {
+            left: -2px;
+            text-shadow: -2px 0 #ccff00;
+            clip: rect(85px, 550px, 140px, 0);
+            animation: glitch-anim 2.5s infinite linear alternate-reverse;
+        }
+
+        @keyframes glitch-anim {
+            0% {
+                clip: rect(22px, 9999px, 83px, 0);
+            }
+
+            20% {
+                clip: rect(6px, 9999px, 86px, 0);
+            }
+
+            40% {
+                clip: rect(67px, 9999px, 86px, 0);
+            }
+
+            60% {
+                clip: rect(59px, 9999px, 2px, 0);
+            }
+
+            80% {
+                clip: rect(74px, 9999px, 66px, 0);
+            }
+
+            100% {
+                clip: rect(100px, 9999px, 12px, 0);
+            }
+        }
+
+        @keyframes glitch-anim-2 {
+            0% {
+                clip: rect(65px, 9999px, 100px, 0);
+            }
+
+            20% {
+                clip: rect(81px, 9999px, 8px, 0);
+            }
+
+            40% {
+                clip: rect(31px, 9999px, 20px, 0);
+            }
+
+            60% {
+                clip: rect(27px, 9999px, 81px, 0);
+            }
+
+            80% {
+                clip: rect(11px, 9999px, 34px, 0);
+            }
+
+            100% {
+                clip: rect(7px, 9999px, 88px, 0);
+            }
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #050505;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #ccff00;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #ff007f;
+        }
+    </style>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+</head>
+
+<body class="text-white selection:bg-neon-yellow selection:text-black relative">
+
+    <!-- Background Design -->
+    <div class="fixed inset-0 z-0 opacity-10 pointer-events-none"
+        style="background: radial-gradient(circle at center, #ccff00 0%, transparent 60%);"></div>
+
+    <!-- Scanline overlay -->
+    <div class="fixed inset-0 z-10 scanlines mix-blend-overlay"></div>
+
+    <!-- Header -->
+    <header
+        class="relative z-20 border-b border-neon-yellow/30 bg-cyber-black/80 backdrop-blur-md px-6 py-4 flex justify-between items-center sticky top-0">
+        <a href="/" class="flex items-center space-x-3 hover:opacity-80 transition-opacity">
+            <div
+                class="w-10 h-10 bg-black flex items-center justify-center border-2 border-neon-yellow shadow-[0_0_15px_rgba(204,255,0,0.5)]">
+                <svg class="w-6 h-6 text-neon-yellow" fill="currentColor" viewBox="0 0 24 24">
+                    <path
+                        d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231z" />
+                </svg>
+            </div>
+            <div>
+                <div class="text-2xl font-bold uppercase tracking-widest text-white glitch-text" data-text="XDRIVE">
+                    XDRIVE</div>
+                <div class="text-[10px] text-neon-yellow tracking-[0.2em] uppercase">Return to Terminal</div>
+            </div>
+        </a>
+        <div class="flex space-x-6 items-center">
+            <a href="/docs.html"
+                class="text-neon-pink hover:text-white font-bold tracking-[0.2em] uppercase text-sm transition-colors relative group">
+                DOCUMENTATION
+                <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-neon-pink group-hover:w-full transition-all"></span>
+            </a>
+            <a href="/extension.html"
+                class="text-neon-yellow hover:text-white font-bold tracking-[0.2em] uppercase text-sm transition-colors relative group">
+                EXTENSION
+                <span class="absolute -bottom-1 left-0 w-full h-0.5 bg-neon-yellow transition-all"></span>
+            </a>
+        </div>
+    </header>
+
+    <!-- Content -->
+    <main class="relative z-20 max-w-4xl mx-auto py-16 px-6 sm:px-12 flex flex-col items-center">
+
+        <div class="text-center mb-16">
+            <h1 class="text-6xl md:text-8xl font-bold text-neon-yellow uppercase tracking-widest mb-6 glitch-text drop-shadow-[0_0_20px_rgba(204,255,0,0.5)]"
+                data-text="X_SCANNER">X_SCANNER</h1>
+            <p class="text-2xl text-white font-bold tracking-widest mb-4">Chrome Extension</p>
+            <p class="text-lg text-gray-400 max-w-xl mx-auto leading-relaxed">Automate the extraction of XDrive image
+                payloads flawlessly from any X.com thread.</p>
+        </div>
+
+        <!-- Big Download Area -->
+        <div
+            class="w-full bg-black/80 border-4 border-neon-yellow p-12 relative overflow-hidden group hover:border-white transition-colors">
+
+            <div class="absolute -right-20 -top-20 opacity-10 group-hover:opacity-20 transition-opacity">
+                <svg class="w-96 h-96 text-neon-yellow" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2L2 22h20L12 2zm0 4.5l6.5 13h-13L12 6.5z" />
+                </svg>
+            </div>
+
+            <div class="relative z-10 flex flex-col items-center">
+                <h3 class="text-2xl font-bold text-white mb-8 tracking-widest text-center uppercase">> INSTALL EXTENSION
+                    LOCALLY</h3>
+
+                <ol
+                    class="text-gray-300 text-lg md:text-xl space-y-6 mb-12 max-w-2xl w-full mx-auto list-decimal list-inside font-sans">
+                    <li>Open Google Chrome browser.</li>
+                    <li>Navigate to URL <span
+                            class="bg-gray-800 text-neon-yellow px-2 py-1 font-mono rounded">chrome://extensions/</span>
+                    </li>
+                    <li>Toggle the <b>Developer Mode</b> switch ON in the top right.</li>
+                    <li>Click <b>Load unpacked</b> in the top left.</li>
+                    <li>Select the <span
+                            class="bg-gray-800 text-neon-pink px-2 py-1 font-mono rounded">extension/</span> folder from
+                        your local XDrive repository.</li>
+                </ol>
+
+                <div
+                    class="bg-dark-violet border border-neon-pink p-6 max-w-2xl w-full shadow-[0_0_20px_rgba(255,0,127,0.2)]">
+                    <h4 class="text-neon-pink font-bold uppercase mb-2">How to Use:</h4>
+                    <p class="text-gray-400 text-sm font-sans">Browse to an X.com post containing a thread of XDrive
+                        payload images. Click the neon yellow terminal icon in your extension bar and press "Extract
+                        Thread". It will aggressively scrape the network to fetch the lossless uncompressed matrices and
+                        automatically download the complete numbered sequence.</p>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Floating Footer -->
+    <footer class="text-center py-8 z-30 relative mt-12 bg-black border-t border-neon-yellow/20">
+        <div class="text-[11px] uppercase tracking-[0.2em] text-gray-500">
+            Made with <span class="text-neon-pink">❤</span> by <a href="#"
+                class="text-neon-yellow hover:text-white transition-colors font-bold">harshalsp</a>
+        </div>
+    </footer>
+
+</body>
+
+</html>
