@@ -17,7 +17,8 @@ const inputDecodeKey = document.getElementById('decode-key');
 const loaderOverlay = document.getElementById('loader-overlay');
 const loaderText = document.getElementById('loader-text');
 
-const CHUNK_SIZE_BYTES = 2 * 1024 * 1024; // 2MB Chunk Limit to stay safely within Vercel's 4.5MB Payload limit
+// 10MB chunk limit since we are doing this entirely locally now, no Vercel limit!
+const CHUNK_SIZE_BYTES = 10 * 1024 * 1024;
 
 // --- WebCrypto Utilities for AES-GCM 256 ---
 
@@ -79,6 +80,98 @@ async function decryptBuffer(encryptedBuffer, password, iv, salt) {
 }
 
 
+// --- Local Canvas Engine for Steganography ---
+const MAGIC_HEADER = new Uint8Array([88, 68, 82, 86]); // 'XDRV'
+
+async function encodeToCanvasBlob(payloadBytes, metadataStr) {
+    const enc = new TextEncoder();
+    const metadataBuf = enc.encode(metadataStr);
+
+    // 4 byte metaLen (Big Endian format)
+    const metaLenBuf = new Uint8Array(4);
+    new DataView(metaLenBuf.buffer).setUint32(0, metadataBuf.length, false);
+
+    const totalLength = MAGIC_HEADER.length + metaLenBuf.length + metadataBuf.length + payloadBytes.length;
+    const finalBuffer = new Uint8Array(totalLength);
+    finalBuffer.set(MAGIC_HEADER, 0);
+    finalBuffer.set(metaLenBuf, 4);
+    finalBuffer.set(metadataBuf, 8);
+    finalBuffer.set(payloadBytes, 8 + metadataBuf.length);
+
+    const pixelsNeeded = Math.ceil(finalBuffer.length / 3);
+    const side = Math.ceil(Math.sqrt(pixelsNeeded));
+
+    // Create an offscreen canvas
+    const canvas = document.createElement('canvas');
+    canvas.width = side;
+    canvas.height = side;
+    const ctx = canvas.getContext('2d');
+    const imageData = ctx.createImageData(side, side);
+
+    let bufIdx = 0;
+    for (let i = 0; i < imageData.data.length; i += 4) {
+        if (bufIdx < finalBuffer.length) {
+            imageData.data[i] = finalBuffer[bufIdx++];
+            imageData.data[i + 1] = bufIdx < finalBuffer.length ? finalBuffer[bufIdx++] : 0;
+            imageData.data[i + 2] = bufIdx < finalBuffer.length ? finalBuffer[bufIdx++] : 0;
+            imageData.data[i + 3] = 255; // Alpha opaque
+        } else {
+            imageData.data[i] = 0;
+            imageData.data[i + 1] = 0;
+            imageData.data[i + 2] = 0;
+            imageData.data[i + 3] = 255;
+        }
+    }
+
+    ctx.putImageData(imageData, 0, 0);
+
+    return new Promise((resolve) => {
+        canvas.toBlob(resolve, 'image/png');
+    });
+}
+
+function decodeFromImageFile(file) {
+    return new Promise((resolve, reject) => {
+        const url = URL.createObjectURL(file);
+        const img = new Image();
+        img.onload = () => {
+            URL.revokeObjectURL(url);
+            const canvas = document.createElement('canvas');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0);
+
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const bytes = new Uint8Array(img.width * img.height * 3);
+
+            let bIdx = 0;
+            for (let i = 0; i < imageData.data.length; i += 4) {
+                bytes[bIdx++] = imageData.data[i];
+                bytes[bIdx++] = imageData.data[i + 1];
+                bytes[bIdx++] = imageData.data[i + 2];
+            }
+
+            // Magic Header Check 'XDRV'
+            if (bytes[0] !== 88 || bytes[1] !== 68 || bytes[2] !== 82 || bytes[3] !== 86) {
+                return reject(new Error("Invalid XDrive Image Format. Missing Magic Header."));
+            }
+
+            const metaLen = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength).getUint32(4, false);
+            const metaBuf = bytes.slice(8, 8 + metaLen);
+            const dec = new TextDecoder();
+            const metaStr = dec.decode(metaBuf);
+            const metadata = JSON.parse(metaStr);
+
+            const payloadBuf = bytes.slice(8 + metaLen, 8 + metaLen + metadata.size);
+            resolve({ metadata, payload: payloadBuf });
+        };
+        img.onerror = () => reject(new Error("Failed to read image pixel data."));
+        img.src = url;
+    });
+}
+
+
 // --- Global UI Actions ---
 function showLoader(text) {
     loaderText.textContent = text;
@@ -110,7 +203,7 @@ window.resetDecode = function () {
     fileDecodeInput.value = '';
 };
 
-// JSZIP dependency will be loaded dynamically if multi-chunk encode is needed
+// JSZIP dependency 
 async function loadJSZip() {
     if (window.JSZip) return window.JSZip;
     return new Promise((resolve, reject) => {
@@ -146,20 +239,19 @@ if (fileEncodeInput) {
 
             showLoader(`> ENCRYPTION COMPLETE. SLICING PAYLOAD (${(encryptedBytes.length / 1024 / 1024).toFixed(2)} MB)...`);
 
-            // 3. Slice the encrypted payload into 2MB chunks to stay under Vercel Serverless limits
+            // 3. Slice the encrypted payload into browser chunks (up to 10MB each realistically)
             const totalChunks = Math.ceil(encryptedBytes.length / CHUNK_SIZE_BYTES);
             const threadId = Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
 
             const generatedBlobs = [];
 
             for (let i = 0; i < totalChunks; i++) {
-                showLoader(`> TRANSMITTING CHUNK ${i + 1}/${totalChunks} TO VERCEL EDGE...`);
+                showLoader(`> RENDER CHUNK ${i + 1}/${totalChunks} IN LOCAL MATRIX...`);
 
                 const start = i * CHUNK_SIZE_BYTES;
                 const end = Math.min(start + CHUNK_SIZE_BYTES, encryptedBytes.length);
                 const chunkBytes = encryptedBytes.slice(start, end);
 
-                // We attach IV and Salt to *every* chunk's metadata so they can be decrypted if isolated (or we just need it once, but redundancy is safe)
                 const metadata = {
                     filename: file.name,
                     size: chunkBytes.length,
@@ -172,20 +264,8 @@ if (fileEncodeInput) {
                     salt: Array.from(salt)
                 };
 
-                const formData = new FormData();
-                // Send the exact chunk bytes as a Blob
-                formData.append('file', new Blob([chunkBytes]), 'chunk.bin');
-                formData.append('metadata', JSON.stringify(metadata));
-
-                // 4. Hit Vercel Serverless Function to wrap the slice in a PNG
-                const response = await fetch('/api/encode', { method: 'POST', body: formData });
-
-                if (!response.ok) {
-                    throw new Error(`Edge Server failed on chunk ${i + 1}`);
-                }
-
-                // Vercel immediately returns the PNG blob stream
-                const pngBlob = await response.blob();
+                // 4. Transform locally in browser via Canvas API! Data never leaves the machine.
+                const pngBlob = await encodeToCanvasBlob(chunkBytes, JSON.stringify(metadata));
                 generatedBlobs.push({ blob: pngBlob, filename: `XDrive-${threadId}-Part${i + 1}of${totalChunks}.png` });
             }
 
@@ -245,28 +325,13 @@ if (fileDecodeInput) {
             const extractedChunks = [];
 
             for (let i = 0; i < files.length; i++) {
-                showLoader(`> EXTRACTING IMAGE ${i + 1}/${files.length} FROM VERCEL EDGE...`);
-                const formData = new FormData();
-                formData.append('image', files[i]);
+                showLoader(`> EXTRACTING IMAGE ${i + 1}/${files.length} FROM LOCAL CANVAS...`);
 
-                const response = await fetch('/api/decode', { method: 'POST', body: formData });
-                if (!response.ok) {
-                    throw new Error(`Edge Decode failed on image ${files[i].name}.`);
-                }
-
-                const data = await response.json();
-
-                // Convert Base64 payload back to Uint8Array
-                const binaryString = window.atob(data.payloadBase64);
-                const len = binaryString.length;
-                const bytes = new Uint8Array(len);
-                for (let j = 0; j < len; j++) {
-                    bytes[j] = binaryString.charCodeAt(j);
-                }
+                const data = await decodeFromImageFile(files[i]);
 
                 extractedChunks.push({
                     metadata: data.metadata,
-                    payload: bytes
+                    payload: data.payload
                 });
             }
 
